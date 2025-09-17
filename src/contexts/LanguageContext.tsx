@@ -124,8 +124,8 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Check for saved language preference or use browser language
-    const savedLang = localStorage.getItem('preferred_language')
-    const browserLang = navigator.language.split('-')[0]
+    const savedLang = typeof window !== 'undefined' ? localStorage.getItem('preferred_language') : null
+    const browserLang = typeof window !== 'undefined' ? navigator.language.split('-')[0] : 'en'
     
     if (savedLang && ['ar', 'fr', 'en'].includes(savedLang)) {
       setCurrentLanguage(savedLang)
@@ -138,15 +138,19 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Update document direction and lang attributes
-    document.documentElement.setAttribute('lang', currentLanguage)
-    document.documentElement.setAttribute('dir', currentLanguage === 'ar' ? 'rtl' : 'ltr')
-    document.body.className = currentLanguage === 'ar' ? 'rtl font-arabic' : 'ltr'
+    if (typeof window !== 'undefined') {
+      document.documentElement.setAttribute('lang', currentLanguage)
+      document.documentElement.setAttribute('dir', currentLanguage === 'ar' ? 'rtl' : 'ltr')
+      document.body.className = currentLanguage === 'ar' ? 'rtl font-arabic' : 'ltr'
+    }
   }, [currentLanguage])
 
   const setLanguage = (lang: string) => {
     if (['ar', 'fr', 'en'].includes(lang)) {
       setCurrentLanguage(lang)
-      localStorage.setItem('preferred_language', lang)
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('preferred_language', lang)
+      }
     }
   }
 

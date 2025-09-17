@@ -1,8 +1,6 @@
 'use client'
 
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import Cookies from 'js-cookie'
-import { authAPI } from '@/services/auth'
 
 interface User {
   id: string
@@ -39,8 +37,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Check for existing token on mount
-    const savedToken = Cookies.get('auth_token')
-    const savedUser = Cookies.get('user_data')
+    const savedToken = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null
+    const savedUser = typeof window !== 'undefined' ? localStorage.getItem('user_data') : null
     
     if (savedToken && savedUser) {
       try {
@@ -48,8 +46,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(JSON.parse(savedUser))
       } catch (error) {
         console.error('Error parsing saved user data:', error)
-        Cookies.remove('auth_token')
-        Cookies.remove('user_data')
+        localStorage.removeItem('auth_token')
+        localStorage.removeItem('user_data')
       }
     }
     
@@ -59,14 +57,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (credentials: any, role: string) => {
     try {
       setIsLoading(true)
-      const response = await authAPI.login(credentials, role)
       
-      setUser(response.user)
-      setToken(response.token)
-      
-      // Save to cookies
-      Cookies.set('auth_token', response.token, { expires: 7 })
-      Cookies.set('user_data', JSON.stringify(response.user), { expires: 7 })
+      // Mock authentication - replace with real API call
+      if (credentials.email === 'zedsolmi@gmail.com' && credentials.password === 'iyed2000') {
+        const mockUser = {
+          id: '1',
+          name: 'Iyed Solmi',
+          email: credentials.email,
+          phone: '+21612345678',
+          role: role as any,
+          verified_phone: true,
+          preferred_language: 'en',
+          created_at: new Date().toISOString()
+        }
+        const mockToken = 'mock-jwt-token-' + Date.now()
+        
+        setUser(mockUser)
+        setToken(mockToken)
+        
+        // Save to localStorage
+        localStorage.setItem('auth_token', mockToken)
+        localStorage.setItem('user_data', JSON.stringify(mockUser))
+      } else {
+        throw new Error('Invalid credentials')
+      }
       
     } catch (error) {
       console.error('Login error:', error)
@@ -79,17 +93,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const register = async (userData: any, role: string) => {
     try {
       setIsLoading(true)
-      const response = await authAPI.register(userData, role)
       
-      if (response.user && response.token) {
-        setUser(response.user)
-        setToken(response.token)
-        
-        Cookies.set('auth_token', response.token, { expires: 7 })
-        Cookies.set('user_data', JSON.stringify(response.user), { expires: 7 })
+      // Mock registration
+      const mockUser = {
+        id: Date.now().toString(),
+        name: userData.name,
+        email: userData.email,
+        phone: userData.phone,
+        role: role as any,
+        verified_phone: true,
+        preferred_language: 'en',
+        created_at: new Date().toISOString()
       }
+      const mockToken = 'mock-jwt-token-' + Date.now()
       
-      return response
+      setUser(mockUser)
+      setToken(mockToken)
+      
+      localStorage.setItem('auth_token', mockToken)
+      localStorage.setItem('user_data', JSON.stringify(mockUser))
+      
+      return { user: mockUser, token: mockToken }
     } catch (error) {
       console.error('Registration error:', error)
       throw error
@@ -101,13 +125,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const verifyOTP = async (phone: string, otp: string, role: string) => {
     try {
       setIsLoading(true)
-      const response = await authAPI.verifyOTP(phone, otp, role)
       
-      setUser(response.user)
-      setToken(response.token)
-      
-      Cookies.set('auth_token', response.token, { expires: 7 })
-      Cookies.set('user_data', JSON.stringify(response.user), { expires: 7 })
+      // Mock OTP verification
+      if (otp === '123456') {
+        const mockUser = {
+          id: Date.now().toString(),
+          name: 'User',
+          email: 'user@example.com',
+          phone: phone,
+          role: role as any,
+          verified_phone: true,
+          preferred_language: 'en',
+          created_at: new Date().toISOString()
+        }
+        const mockToken = 'mock-jwt-token-' + Date.now()
+        
+        setUser(mockUser)
+        setToken(mockToken)
+        
+        localStorage.setItem('auth_token', mockToken)
+        localStorage.setItem('user_data', JSON.stringify(mockUser))
+      } else {
+        throw new Error('Invalid OTP')
+      }
       
     } catch (error) {
       console.error('OTP verification error:', error)
@@ -119,7 +159,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const requestOTP = async (phone: string) => {
     try {
-      await authAPI.requestOTP(phone)
+      // Mock OTP request
+      console.log('OTP sent to:', phone)
     } catch (error) {
       console.error('OTP request error:', error)
       throw error
@@ -128,10 +169,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const updateProfile = async (data: Partial<User>) => {
     try {
-      const response = await authAPI.updateProfile(data, token!)
-      setUser(response.user)
+      const updatedUser = { ...user!, ...data }
+      setUser(updatedUser)
       
-      Cookies.set('user_data', JSON.stringify(response.user), { expires: 7 })
+      localStorage.setItem('user_data', JSON.stringify(updatedUser))
     } catch (error) {
       console.error('Profile update error:', error)
       throw error
@@ -141,8 +182,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = () => {
     setUser(null)
     setToken(null)
-    Cookies.remove('auth_token')
-    Cookies.remove('user_data')
+    localStorage.removeItem('auth_token')
+    localStorage.removeItem('user_data')
     window.location.href = '/'
   }
 
