@@ -1,8 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useState, useEffect } from 'react'
-import { io, Socket } from 'socket.io-client'
-import { useAuth } from './AuthContext'
+import React, { createContext, useContext, useState } from 'react'
 
 interface Notification {
   id: string
@@ -22,64 +20,12 @@ interface NotificationContextType {
   markAllAsRead: () => void
   removeNotification: (id: string) => void
   clearAll: () => void
-  socket: Socket | null
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined)
 
 export function NotificationProvider({ children }: { children: React.ReactNode }) {
   const [notifications, setNotifications] = useState<Notification[]>([])
-  const [socket, setSocket] = useState<Socket | null>(null)
-  const { user, token } = useAuth()
-
-  // Initialize Socket.IO connection
-  useEffect(() => {
-    if (user && token) {
-      const newSocket = io(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001', {
-        auth: {
-          token: token
-        }
-      })
-
-      newSocket.on('connect', () => {
-        console.log('Connected to notification server')
-      })
-
-      newSocket.on('notification', (data: Notification) => {
-        addNotification(data)
-        
-        // Show browser notification if permission granted
-        if (Notification.permission === 'granted') {
-          new Notification(data.title, {
-            body: data.message,
-            icon: '/favicon.ico'
-          })
-        }
-      })
-
-      newSocket.on('order_update', (data: any) => {
-        addNotification({
-          type: 'order',
-          title: 'Order Update',
-          message: `Your order #${data.order_id} is now ${data.status}`,
-          data: data
-        })
-      })
-
-      setSocket(newSocket)
-
-      return () => {
-        newSocket.close()
-      }
-    }
-  }, [user, token])
-
-  // Request notification permission
-  useEffect(() => {
-    if ('Notification' in window && Notification.permission === 'default') {
-      Notification.requestPermission()
-    }
-  }, [])
 
   const addNotification = (notification: Omit<Notification, 'id' | 'created_at' | 'read'>) => {
     const newNotification: Notification = {
@@ -123,8 +69,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     markAsRead,
     markAllAsRead,
     removeNotification,
-    clearAll,
-    socket
+    clearAll
   }
 
   return (

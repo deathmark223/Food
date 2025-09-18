@@ -37,8 +37,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Check for existing token on mount
-    const savedToken = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null
-    const savedUser = typeof window !== 'undefined' ? localStorage.getItem('user_data') : null
+    const savedToken = localStorage.getItem('auth_token')
+    const savedUser = localStorage.getItem('user_data')
     
     if (savedToken && savedUser) {
       try {

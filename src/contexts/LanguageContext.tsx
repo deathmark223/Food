@@ -26,24 +26,10 @@ const translations = {
     'roles.rider.description': 'توصيل الطلبات وكسب المال',
     'roles.admin.title': 'مدير',
     'roles.admin.description': 'إدارة المنصة والمستخدمين',
-    'features.title': 'لماذا تختار كارثاغو فود؟',
-    'features.local_restaurants': 'مطاعم محلية',
-    'features.local_description': 'ادعم الأعمال المحلية في مولارس واستمتع بالمأكولات التونسية الأصيلة',
-    'features.fast_delivery': 'توصيل سريع',
-    'features.delivery_description': 'توصيل سريع وموثوق إلى باب منزلك مع تتبع في الوقت الفعلي',
-    'features.easy_ordering': 'طلب سهل',
-    'features.ordering_description': 'عملية طلب بسيطة وبديهية مع خيارات دفع متعددة',
-    'footer.description': 'نجلب الطعام اللذيذ إلى مولارس، قفصة، تونس',
-    'footer.company': 'الشركة',
-    'footer.about': 'عنا',
-    'footer.contact': 'اتصل بنا',
-    'footer.careers': 'الوظائف',
-    'footer.legal': 'قانوني',
-    'footer.terms': 'شروط الخدمة',
-    'footer.privacy': 'سياسة الخصوصية',
-    'footer.cookies': 'سياسة ملفات تعريف الارتباط',
-    'footer.location': 'الموقع',
-    'footer.rights': 'جميع الحقوق محفوظة.',
+    'auth.login': 'تسجيل الدخول',
+    'auth.logout': 'تسجيل الخروج',
+    'common.back': 'رجوع',
+    'common.back_home': 'العودة للرئيسية'
   },
   fr: {
     'hero.title': 'Nourriture Délicieuse',
@@ -61,24 +47,10 @@ const translations = {
     'roles.rider.description': 'Livrez des commandes et gagnez de l\'argent',
     'roles.admin.title': 'Administrateur',
     'roles.admin.description': 'Gérez la plateforme et les utilisateurs',
-    'features.title': 'Pourquoi Choisir Carthago Food?',
-    'features.local_restaurants': 'Restaurants Locaux',
-    'features.local_description': 'Soutenez les entreprises locales de Moulares et savourez la cuisine tunisienne authentique',
-    'features.fast_delivery': 'Livraison Rapide',
-    'features.delivery_description': 'Livraison rapide et fiable à votre porte avec suivi en temps réel',
-    'features.easy_ordering': 'Commande Facile',
-    'features.ordering_description': 'Processus de commande simple et intuitif avec plusieurs options de paiement',
-    'footer.description': 'Apporter de la nourriture délicieuse à Moulares, Gafsa, Tunisie',
-    'footer.company': 'Entreprise',
-    'footer.about': 'À Propos',
-    'footer.contact': 'Contact',
-    'footer.careers': 'Carrières',
-    'footer.legal': 'Légal',
-    'footer.terms': 'Conditions de Service',
-    'footer.privacy': 'Politique de Confidentialité',
-    'footer.cookies': 'Politique des Cookies',
-    'footer.location': 'Emplacement',
-    'footer.rights': 'Tous droits réservés.',
+    'auth.login': 'Connexion',
+    'auth.logout': 'Déconnexion',
+    'common.back': 'Retour',
+    'common.back_home': 'Retour à l\'accueil'
   },
   en: {
     'hero.title': 'Delicious Food',
@@ -96,24 +68,10 @@ const translations = {
     'roles.rider.description': 'Deliver orders and earn money',
     'roles.admin.title': 'Admin',
     'roles.admin.description': 'Manage the platform and users',
-    'features.title': 'Why Choose Carthago Food?',
-    'features.local_restaurants': 'Local Restaurants',
-    'features.local_description': 'Support local businesses in Moulares and enjoy authentic Tunisian cuisine',
-    'features.fast_delivery': 'Fast Delivery',
-    'features.delivery_description': 'Quick and reliable delivery to your doorstep with real-time tracking',
-    'features.easy_ordering': 'Easy Ordering',
-    'features.ordering_description': 'Simple and intuitive ordering process with multiple payment options',
-    'footer.description': 'Bringing delicious food to Moulares, Gafsa, Tunisia',
-    'footer.company': 'Company',
-    'footer.about': 'About Us',
-    'footer.contact': 'Contact',
-    'footer.careers': 'Careers',
-    'footer.legal': 'Legal',
-    'footer.terms': 'Terms of Service',
-    'footer.privacy': 'Privacy Policy',
-    'footer.cookies': 'Cookie Policy',
-    'footer.location': 'Location',
-    'footer.rights': 'All rights reserved.',
+    'auth.login': 'Login',
+    'auth.logout': 'Logout',
+    'common.back': 'Back',
+    'common.back_home': 'Back to Home'
   }
 }
 
@@ -124,8 +82,8 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Check for saved language preference or use browser language
-    const savedLang = typeof window !== 'undefined' ? localStorage.getItem('preferred_language') : null
-    const browserLang = typeof window !== 'undefined' ? navigator.language.split('-')[0] : 'en'
+    const savedLang = localStorage.getItem('preferred_language')
+    const browserLang = navigator.language.split('-')[0]
     
     if (savedLang && ['ar', 'fr', 'en'].includes(savedLang)) {
       setCurrentLanguage(savedLang)
@@ -138,19 +96,15 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Update document direction and lang attributes
-    if (typeof window !== 'undefined') {
-      document.documentElement.setAttribute('lang', currentLanguage)
-      document.documentElement.setAttribute('dir', currentLanguage === 'ar' ? 'rtl' : 'ltr')
-      document.body.className = currentLanguage === 'ar' ? 'rtl font-arabic' : 'ltr'
-    }
+    document.documentElement.setAttribute('lang', currentLanguage)
+    document.documentElement.setAttribute('dir', currentLanguage === 'ar' ? 'rtl' : 'ltr')
+    document.body.className = currentLanguage === 'ar' ? 'rtl font-arabic' : 'ltr'
   }, [currentLanguage])
 
   const setLanguage = (lang: string) => {
     if (['ar', 'fr', 'en'].includes(lang)) {
       setCurrentLanguage(lang)
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('preferred_language', lang)
-      }
+      localStorage.setItem('preferred_language', lang)
     }
   }
 
